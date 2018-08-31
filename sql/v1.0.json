@@ -1,0 +1,168 @@
+{
+	"job_item": {
+		"version": {
+			"name": "version",
+			"type": "int",
+			"title": "版本号"
+		},
+		"ctime": {
+			"name": "ctime",
+			"type": "long",
+			"title": "创建时间"
+		},
+		"title": {
+			"type": "string",
+			"length": 255,
+			"title": "说明",
+			"name": "title"
+		},
+		"uid": {
+			"index": "asc",
+			"name": "uid",
+			"type": "long",
+			"title": "用户ID"
+		},
+		"jobId": {
+			"type": "long",
+			"title": "工作ID",
+			"index": "asc",
+			"name": "jobId"
+		},
+		"mtime": {
+			"name": "mtime",
+			"type": "long",
+			"title": "修改时间"
+		},
+		"slaveId": {
+			"title": "工作机ID",
+			"index": "asc",
+			"name": "slaveId",
+			"type": "long"
+		},
+		"options": {
+			"name": "options",
+			"type": "object",
+			"title": "其他数据"
+		},
+		"status": {
+			"type": "int",
+			"title": "状态",
+			"index": "asc",
+			"name": "status"
+		}
+	},
+	"job_log": {
+		"ctime": {
+			"name": "ctime",
+			"type": "long",
+			"title": "创建时间"
+		},
+		"iid": {
+			"type": "long",
+			"title": "工作项ID",
+			"index": "asc",
+			"name": "iid"
+		},
+		"message": {
+			"length": -1,
+			"title": "日志",
+			"name": "message",
+			"type": "string"
+		}
+	},
+	"slave": {
+		"platform": {
+			"title": "平台",
+			"type": "string",
+			"length": 64,
+			"index": "asc",
+			"name": "platform"
+		},
+		"status": {
+			"name": "status",
+			"type": "int",
+			"title": "状态",
+			"index": "asc"
+		},
+		"options": {
+			"name": "options",
+			"type": "object",
+			"title": "其他数据"
+		},
+		"ctime": {
+			"title": "创建时间",
+			"name": "ctime",
+			"type": "long"
+		},
+		"title": {
+			"title": "说明",
+			"name": "title",
+			"type": "string",
+			"length": 255
+		},
+		"token": {
+			"type": "string",
+			"length": 64,
+			"index": "asc",
+			"title": "TOKEN",
+			"name": "token"
+		},
+		"uid": {
+			"name": "uid",
+			"type": "long",
+			"title": "用户ID",
+			"index": "asc"
+		}
+	},
+	"job": {
+		"platform": {
+			"type": "string",
+			"length": 64,
+			"name": "platform",
+			"title": "平台"
+		},
+		"version": {
+			"name": "version",
+			"type": "int",
+			"title": "最新版本号"
+		},
+		"options": {
+			"name": "options",
+			"type": "object",
+			"title": "其他数据"
+		},
+		"script": {
+			"name": "script",
+			"type": "string",
+			"length": -2,
+			"title": "脚本"
+		},
+		"ctime": {
+			"type": "long",
+			"title": "创建时间",
+			"name": "ctime"
+		},
+		"mtime": {
+			"name": "mtime",
+			"type": "long",
+			"title": "修改时间"
+		},
+		"title": {
+			"name": "title",
+			"type": "string",
+			"length": 255,
+			"title": "说明"
+		},
+		"uid": {
+			"name": "uid",
+			"type": "long",
+			"title": "用户ID",
+			"index": "asc"
+		},
+		"env": {
+			"name": "env",
+			"type": "object",
+			"title": "环境数据"
+		}
+	}
+}

@@ -1,0 +1,430 @@
+
+title: 自动化
+type: kk/micro
+
+services:
+  Slave:
+    title: 工作机服务
+    tasks:
+      SlaveCreate:
+        title: 创建
+        name: slave/create
+        input:
+          - name: title
+            type: string
+            title: 说明
+          - name: uid
+            type: long
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: string
+          - name: options
+            type: object
+            title: 其他数据
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+      SlaveSet:
+        title: 修改
+        name: slave/set
+        input:
+          - name: id
+            title: ID
+            type: long
+          - name: title
+            type: string
+            title: 说明
+          - name: uid
+            type: object
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: string
+          - name: status
+            title: 状态
+            type: object
+          - name: options
+            type: object
+            title: 其他数据
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+      SlaveGet:
+        title: 获取
+        name: slave/get
+        input:
+          - name: id
+            title: ID
+            type: long
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+      SlaveRemove:
+        title: 删除
+        name: slave/remove
+        input:
+          - name: id
+            title: ID
+            type: long
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+      SlaveQuery:
+        title: 查询
+        name: slave/query
+        type: query
+        input:
+          - name: id
+            title: TODO ID
+            type: long
+          - name: uid
+            type: object
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: string
+          - name: status
+            title: 状态 多个逗号分割
+            type: string
+          - name: orderBy
+            type: string
+            title: desc 降序默认 asc 升序
+        output:
+          - name: slaves
+            title: 工作机
+            omitempty: true
+            type: Slave[]
+
+  Job:
+    title: 工作服务
+    tasks:
+      JobCreate:
+        title: 创建
+        name: job/create
+        input:
+          - name: title
+            type: string
+            title: 说明
+          - name: uid
+            type: long
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: string
+          - name: options
+            type: object
+            title: 其他数据
+          - name: env
+            type: object
+            title: 环境数据
+          - name: script
+            type: string
+            title: 脚本
+        output:
+          - name: job
+            type: Job
+            omitempty: true
+            title: 工作
+      JobSet:
+        title: 修改
+        name: job/set
+        input:
+          - name: id
+            title: ID
+            type: long
+          - name: title
+            type: string
+            title: 说明
+          - name: uid
+            type: object
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: object
+          - name: options
+            type: object
+            title: 其他数据
+          - name: env
+            type: object
+            title: 环境数据
+          - name: script
+            type: object
+            title: 脚本
+        output:
+          - name: job
+            type: Job
+            omitempty: true
+            title: 工作
+      JobGet:
+        title: 获取
+        name: job/get
+        input:
+          - name: id
+            title: ID
+            type: long
+        output:
+          - name: job
+            type: Job
+            omitempty: true
+            title: 工作
+      JobRemove:
+        title: 删除
+        name: job/remove
+        input:
+          - name: id
+            title: ID
+            type: long
+        output:
+          - name: job
+            type: Job
+            omitempty: true
+            title: 工作
+      JobQuery:
+        title: 查询
+        name: job/query
+        type: query
+        input:
+          - name: id
+            title: 工作ID
+            type: long
+          - name: uid
+            type: object
+            title: 用户ID
+          - name: platform
+            title: 平台
+            type: string
+          - name: orderBy
+            type: string
+            title: desc 降序默认 asc 升序
+        output:
+          - name: jobs
+            title: 工作
+            omitempty: true
+            type: Job[]
+  JobItem:
+    title: 工作项服务
+    tasks:
+      JobItemCreate:
+        title: 创建
+        name: job/item/create
+        input:
+          - name: title
+            type: string
+            title: 说明
+          - name: uid
+            type: long
+            title: 用户ID
+          - name: jobId
+            type: long
+            title: 工作ID
+          - name: options
+            type: object
+            title: 其他数据
+        output:
+          - name: item
+            type: JobItem
+            omitempty: true
+            title: 工作项
+      JobItemGet:
+        title: 获取
+        name: job/item/get
+        input:
+          - name: id
+            title: ID
+            type: long
+        output:
+          - name: item
+            type: JobItem
+            omitempty: true
+            title: 工作项
+      JobItemQuery:
+        title: 查询
+        name: job/item/query
+        type: query
+        input:
+          - name: jobId
+            title: 工作ID
+            type: long
+          - name: uid
+            type: object
+            title: 用户ID
+          - name: status
+            title: 状态 多个逗号分割
+            type: string
+          - name: orderBy
+            type: string
+            title: desc 降序默认 asc 升序
+        output:
+          - name: items
+            title: 工作
+            omitempty: true
+            type: JobItem[]
+  JobLog:
+    title: 工作日志服务
+    tasks:
+      JobLogCreate:
+        title: 创建
+        name: job/log/create
+        input:
+          - name: iid
+            type: long
+            title: 工作项ID
+          - name: message
+            type: string
+            title: 日志
+        output:
+          - name: log
+            type: JobLog
+            omitempty: true
+            title: 工作日志
+      JobLogQuery:
+        title: 查询
+        name: job/log/query
+        type: query
+        input:
+          - name: iid
+            type: long
+            title: 工作项ID
+          - name: orderBy
+            type: string
+            title: desc 降序默认 asc 升序
+        output:
+          - name: items
+            title: 工作日志
+            omitempty: true
+            type: JobLog[]          
+            
+objects:
+  Slave:
+    title: 工作机
+    name: slave
+    type: db
+    fields:
+      - name: title
+        type: string
+        length: 255
+        title: 说明
+      - name: token
+        type: string
+        length: 64
+        index: asc
+        title: TOKEN
+      - name: uid
+        type: long
+        title: 用户ID
+        index: asc
+      - name: platform
+        title: 平台
+        type: string
+        length: 64
+        index: asc
+      - name: status
+        type: int
+        title: 状态
+        index: asc
+      - name: options
+        type: object
+        title: 其他数据
+      - name: ctime
+        type: long
+        title: 创建时间
+  Job:
+    title: 工作
+    name: job
+    type: db
+    fields:
+      - name: title
+        type: string
+        length: 255
+        title: 说明
+      - name: uid
+        type: long
+        title: 用户ID
+        index: asc
+      - name: platform
+        title: 平台
+        type: string
+        length: 64
+      - name: version
+        type: int
+        title: 最新版本号
+      - name: options
+        type: object
+        title: 其他数据
+      - name: env
+        type: object
+        title: 环境数据
+      - name: script
+        type: string
+        length: -2
+        title: 脚本
+      - name: ctime
+        type: long
+        title: 创建时间
+      - name: mtime
+        type: long
+        title: 修改时间
+  JobItem:
+    title: 工作项
+    name: job_item
+    type: db
+    fields:
+      - name: title
+        type: string
+        length: 255
+        title: 说明
+      - name: uid
+        type: long
+        title: 用户ID
+        index: asc
+      - name: jobId
+        type: long
+        title: 工作ID
+        index: asc
+      - name: slaveId
+        type: long
+        title: 工作机ID
+        index: asc
+      - name: version
+        type: int
+        title: 版本号
+      - name: options
+        type: object
+        title: 其他数据
+      - name: status
+        type: int
+        title: 状态
+        index: asc
+      - name: ctime
+        type: long
+        title: 创建时间
+      - name: mtime
+        type: long
+        title: 修改时间
+  JobLog:
+    title: 工作日志
+    name: job_log
+    type: db
+    fields:
+      - name: iid
+        type: long
+        title: 工作项ID
+        index: asc
+      - name: message
+        type: string
+        length: -1
+        title: 日志
+      - name: ctime
+        type: long
+        title: 创建时间
+
+        
