@@ -21,6 +21,9 @@ type /*B(Task)*/ JobLogQueryTask /*E(Task)*/ struct {
 	/*E(Task.Base)*/
 
 	/*B(Input)*/ /*E(Input)*/
+	/*B(Input.jobId)*/
+	JobId int64 `json:"jobId" title:"工作ID"`
+	/*E(Input.jobId)*/
 	/*B(Input.orderBy)*/
 	OrderBy string `json:"orderBy" title:"desc 降序默认 asc 升序"`
 	/*E(Input.orderBy)*/

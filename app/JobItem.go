@@ -1,14 +1,14 @@
 package app
 
 /*B(Import)*/
-import "github.com/hailongz/kk-lib/db"
-
-/*E(Import)*/
+	import "github.com/hailongz/kk-lib/db"
+	/*E(Import)*/
 
 const (
-	JOB_ITEM_STATUS_NONE  = 0
-	JOB_ITEM_STATUS_OK    = 200
-	JOB_ITEM_STATUS_ERROR = 400
+	JOB_ITEM_STATUS_NONE    = 0
+	JOB_ITEM_STATUS_RUNNING = 1
+	JOB_ITEM_STATUS_OK      = 200
+	JOB_ITEM_STATUS_ERROR   = 400
 )
 
 type /*B(Object)*/ JobItem /*E(Object)*/ struct {

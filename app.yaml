@@ -46,6 +46,9 @@ services:
           - name: status
             title: 状态
             type: object
+          - name: token
+            title: 是否重新生成TOKEN
+            type: boolean
           - name: options
             type: object
             title: 其他数据
@@ -73,6 +76,18 @@ services:
           - name: id
             title: ID
             type: long
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+      SlaveLogin:
+        title: 登录
+        name: slave/login
+        input:
+          - name: token
+            title: TOKEN
+            type: string
         output:
           - name: slave
             type: Slave
@@ -238,6 +253,9 @@ services:
         title: 获取
         name: job/item/get
         input:
+          - name: jobId
+            type: long
+            title: 工作ID
           - name: id
             title: ID
             type: long
@@ -275,6 +293,9 @@ services:
         title: 创建
         name: job/log/create
         input:
+          - name: jobId
+            type: long
+            title: 工作ID
           - name: iid
             type: long
             title: 工作项ID
@@ -291,6 +312,9 @@ services:
         name: job/log/query
         type: query
         input:
+          - name: jobId
+            type: long
+            title: 工作ID
           - name: iid
             type: long
             title: 工作项ID
@@ -415,6 +439,10 @@ objects:
     name: job_log
     type: db
     fields:
+      - name: jobId
+        type: long
+        title: 工作ID
+        index: asc
       - name: iid
         type: long
         title: 工作项ID

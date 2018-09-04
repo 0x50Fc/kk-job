@@ -4,6 +4,11 @@ package app
 	import "github.com/hailongz/kk-lib/db"
 	/*E(Import)*/
 
+const (
+	SLAVE_STATUS_NONE   = 0 //离线
+	SLAVE_STATUS_ONLINE = 1 //在线
+)
+
 type /*B(Object)*/ Slave /*E(Object)*/ struct {
 	/*B(Object.Base)*/
 	db.Object

@@ -18,6 +18,9 @@ type /*B(Task)*/ SlaveSetTask /*E(Task)*/ struct {
 	/*E(Task.Base)*/
 
 	/*B(Input)*/ /*E(Input)*/
+	/*B(Input.token)*/
+	Token bool `json:"token" title:"是否重新生成TOKEN"`
+	/*E(Input.token)*/
 	/*B(Input.options)*/
 	Options interface{} `json:"options" title:"其他数据"`
 	/*E(Input.options)*/

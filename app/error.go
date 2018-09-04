@@ -1,1 +1,7 @@
 package app
+
+const (
+	ERROR_NOT_FOUND_ID    = 50001
+	ERROR_NOT_FOUND       = 50002
+	ERROR_NOT_FOUND_TOKEN = 50003
+)

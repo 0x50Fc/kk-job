@@ -18,6 +18,9 @@ type /*B(Task)*/ JobItemGetTask /*E(Task)*/ struct {
 	/*E(Task.Base)*/
 
 	/*B(Input)*/ /*E(Input)*/
+	/*B(Input.jobId)*/
+	JobId int64 `json:"jobId" title:"工作ID"`
+	/*E(Input.jobId)*/
 	/*B(Input.id)*/
 	Id int64 `json:"id" title:"ID"`
 	/*E(Input.id)*/

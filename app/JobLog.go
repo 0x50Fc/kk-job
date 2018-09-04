@@ -10,6 +10,9 @@ type /*B(Object)*/ JobLog /*E(Object)*/ struct {
 	/*E(Object.Base)*/
 
 	/*B(Property)*/ /*E(Property)*/
+	/*B(Property.jobId)*/
+	JobId int64 `json:"jobId" title:"工作ID" index:"asc"`
+	/*E(Property.jobId)*/
 	/*B(Property.ctime)*/
 	Ctime int64 `json:"ctime" title:"创建时间"`
 	/*E(Property.ctime)*/
