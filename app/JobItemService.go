@@ -84,8 +84,22 @@ func (S *JobItemService) HandleJobItemCreateTask(a micro.IApp, task *JobItemCrea
 			}
 
 			job.Mtime = v.Mtime
+			job.Version = v.Version
 
 			_, err = db.UpdateWithKeys(tx, &job, prefix, map[string]bool{"mtime": true, "version": true})
+
+			if err != nil {
+				return err
+			}
+
+			item := JobQueue{}
+			item.Iid = v.Id
+			item.JobId = job.Id
+			item.Uid = job.Uid
+			item.Platform = job.Platform
+			item.Ctime = v.Ctime
+
+			_, err = db.Insert(tx, &item, prefix)
 
 			if err != nil {
 				return err

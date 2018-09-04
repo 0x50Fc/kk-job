@@ -32,9 +32,6 @@ type /*B(Object)*/ JobItem /*E(Object)*/ struct {
 	/*B(Property.version)*/
 	Version int `json:"version" title:"版本号"`
 	/*E(Property.version)*/
-	/*B(Property.slaveId)*/
-	SlaveId int64 `json:"slaveId" title:"工作机ID" index:"asc"`
-	/*E(Property.slaveId)*/
 	/*B(Property.jobId)*/
 	JobId int64 `json:"jobId" title:"工作ID" index:"asc"`
 	/*E(Property.jobId)*/

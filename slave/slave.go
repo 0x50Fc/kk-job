@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -40,16 +39,18 @@ func NewSlave(workdir string, baseURL string, token string, maxCount int) ISlave
 
 type slaveWriter struct {
 	slave        *Slave
+	jobId        int64
 	iid          int64
 	fd           *os.File
 	line         *bytes.Buffer
 	securityKeys map[string]string
 }
 
-func newSlaveWriter(slave *Slave, iid int64, path string, securityKeys map[string]string) (*slaveWriter, error) {
+func newSlaveWriter(slave *Slave, jobId int64, iid int64, path string, securityKeys map[string]string) (*slaveWriter, error) {
 	v := slaveWriter{}
 	v.slave = slave
 	v.iid = iid
+	v.jobId = jobId
 
 	var err error = nil
 
@@ -67,14 +68,26 @@ func newSlaveWriter(slave *Slave, iid int64, path string, securityKeys map[strin
 
 	}
 
+	v.line = bytes.NewBuffer(nil)
+	v.securityKeys = securityKeys
+
 	return &v, err
 }
 
 func (L *slaveWriter) Close() error {
-	return L.fd.Close()
+	if L.fd != nil {
+		err := L.fd.Close()
+		L.fd = nil
+		return err
+	}
+	return nil
 }
 
 func (L *slaveWriter) Write(p []byte) (n int, err error) {
+
+	if L.fd == nil {
+		return 0, nil
+	}
 
 	for _, c := range p {
 		if c == '\n' {
@@ -89,6 +102,7 @@ func (L *slaveWriter) Write(p []byte) (n int, err error) {
 			task.Token = L.slave.token
 			task.Message = v
 			task.Iid = L.iid
+			task.JobId = L.jobId
 
 			err := L.slave.remote.Handle(&task)
 
@@ -107,37 +121,53 @@ func (L *slaveWriter) Write(p []byte) (n int, err error) {
 
 func (S *Slave) Run() {
 
-	ch := make(chan SlaveJobItemTaskResult, S.maxCount)
+	ch := make(chan SlaveJobGetTaskResult, S.maxCount)
 
 	defer close(ch)
 
 	go func() {
 
+		isLogin := false
+
 		for {
 
-			task := SlaveLoginTask{}
-			task.Token = S.token
-			task.Platform = runtime.GOOS
+			if !isLogin {
 
-			err := S.remote.Handle(&task)
+				task := SlaveLoginTask{}
+				task.Token = S.token
+				task.Platform = "bash"
 
-			if err != nil {
-				log.Println("[LOGIN] [ERROR]", err)
-				time.Sleep(6 + time.Second)
-				continue
+				err := S.remote.Handle(&task)
+
+				if err != nil {
+					log.Println("[LOGIN] [ERROR]", err)
+					time.Sleep(6 + time.Second)
+					continue
+				}
+
+				isLogin = true
+
+				log.Println("[LOGIN] [OK]")
 			}
 
-			break
-		}
-
-		for {
-
-			task := SlaveJobItemTask{}
+			task := SlaveJobGetTask{}
 			task.Token = S.token
 
 			err := S.remote.Handle(&task)
 
 			if err != nil {
+
+				e, ok := err.(*micro.Error)
+
+				if ok {
+					if e.Code == 50002 {
+						time.Sleep(6 + time.Second)
+						continue
+					}
+				}
+
+				isLogin = false
+
 				log.Println("[JOB] [ERROR]", err)
 				time.Sleep(6 + time.Second)
 				continue
@@ -152,7 +182,7 @@ func (S *Slave) Run() {
 
 		r := <-ch
 
-		go func(r SlaveJobItemTaskResult) {
+		go func(r SlaveJobGetTaskResult) {
 
 			path := filepath.Join(S.workdir, strconv.FormatInt(r.Job.Id, 10), strconv.Itoa(r.JobItem.Version))
 
@@ -220,7 +250,7 @@ func (S *Slave) Run() {
 
 				cmd.Dir = path
 
-				stdout, err := newSlaveWriter(S, r.JobItem.Id, filepath.Join(path, "info.log"), securityKeys)
+				stdout, err := newSlaveWriter(S, r.Job.Id, r.JobItem.Id, filepath.Join(path, "info.log"), securityKeys)
 
 				if err != nil {
 					return err
@@ -250,11 +280,15 @@ func (S *Slave) Run() {
 				task := SlaveJobSetTask{}
 				task.Token = S.token
 				task.Status = app.JOB_ITEM_STATUS_OK
+				task.Iid = r.JobItem.Id
+				task.JobId = r.Job.Id
 				err = S.remote.Handle(&task)
 			} else {
 				task := SlaveJobSetTask{}
 				task.Token = S.token
 				task.Status = app.JOB_ITEM_STATUS_ERROR
+				task.Iid = r.JobItem.Id
+				task.JobId = r.Job.Id
 				S.remote.Handle(&task)
 			}
 

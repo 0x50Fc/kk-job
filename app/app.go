@@ -32,22 +32,25 @@ func Open(app micro.IApp) micro.IApp {
 	/*B(App.Service.Job)*/
 	{
 		s := JobService{}
-		app.Use(&JobRemoveTask{},&s)
-		app.Use(&JobQueryTask{},&s)
 		app.Use(&JobCreateTask{},&s)
 		app.Use(&JobSetTask{},&s)
 		app.Use(&JobGetTask{},&s)
+		app.Use(&JobRemoveTask{},&s)
+		app.Use(&JobQueryTask{},&s)
 	}
 	/*E(App.Service.Job)*/
 	/*B(App.Service.Slave)*/
 	{
 		s := SlaveService{}
+		app.Use(&SlaveRemoveTask{},&s)
+		app.Use(&SlaveLoginTask{},&s)
+		app.Use(&SlaveJobSetTask{},&s)
+		app.Use(&SlaveQueryTask{},&s)
 		app.Use(&SlaveCreateTask{},&s)
 		app.Use(&SlaveSetTask{},&s)
 		app.Use(&SlaveGetTask{},&s)
-		app.Use(&SlaveRemoveTask{},&s)
-		app.Use(&SlaveLoginTask{},&s)
-		app.Use(&SlaveQueryTask{},&s)
+		app.Use(&SlaveJobGetTask{},&s)
+		app.Use(&SlaveJobLogTask{},&s)
 	}
 	/*E(App.Service.Slave)*/
 

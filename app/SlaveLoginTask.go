@@ -18,6 +18,15 @@ type /*B(Task)*/ SlaveLoginTask /*E(Task)*/ struct {
 	/*E(Task.Base)*/
 
 	/*B(Input)*/ /*E(Input)*/
+	/*B(Input.options)*/
+	Options interface{} `json:"options" title:"其他数据"`
+	/*E(Input.options)*/
+	/*B(Input.platform)*/
+	Platform string `json:"platform" title:"平台"`
+	/*E(Input.platform)*/
+	/*B(Input.title)*/
+	Title string `json:"title" title:"说明"`
+	/*E(Input.title)*/
 	/*B(Input.token)*/
 	Token string `json:"token" title:"TOKEN"`
 	/*E(Input.token)*/

@@ -15,6 +15,7 @@ build() {
 
     kk-cli sql --prefix ${PREFIX} --name job --autoIncrement 1 $KK_FLAGS >> sql/$PREFIX$TO_VER.sql
     kk-cli sql --prefix ${PREFIX} --name slave --autoIncrement 1 $KK_FLAGS >> sql/$PREFIX$TO_VER.sql
+    kk-cli sql --prefix ${PREFIX} --name job_queue --autoIncrement 1 $KK_FLAGS >> sql/$PREFIX$TO_VER.sql
 
     COUNT=$1
 

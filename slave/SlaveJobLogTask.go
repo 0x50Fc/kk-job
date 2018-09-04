@@ -5,6 +5,7 @@ type SlaveJobLogTaskResult struct {
 
 type SlaveJobLogTask struct {
 	Token   string `json:"token" title:"token"`
+	JobId   int64  `json:"jobId" title:"工作ID"`
 	Iid     int64  `json:"iid" title:"工作项ID"`
 	Message string `json:"message" title:"日志"`
 

@@ -1,5 +1,10 @@
 {
 	"slave": {
+		"ctime": {
+			"name": "ctime",
+			"type": "long",
+			"title": "创建时间"
+		},
 		"title": {
 			"name": "title",
 			"type": "string",
@@ -7,58 +12,43 @@
 			"title": "说明"
 		},
 		"token": {
+			"name": "token",
 			"type": "string",
 			"length": 64,
 			"index": "asc",
-			"title": "TOKEN",
-			"name": "token"
+			"title": "TOKEN"
 		},
 		"uid": {
+			"index": "asc",
 			"name": "uid",
 			"type": "long",
-			"title": "用户ID",
-			"index": "asc"
+			"title": "用户ID"
 		},
 		"platform": {
-			"name": "platform",
 			"title": "平台",
 			"type": "string",
 			"length": 64,
-			"index": "asc"
+			"index": "asc",
+			"name": "platform"
 		},
 		"status": {
-			"title": "状态",
-			"index": "asc",
 			"name": "status",
-			"type": "int"
+			"type": "int",
+			"title": "状态",
+			"index": "asc"
 		},
 		"options": {
 			"name": "options",
 			"type": "object",
 			"title": "其他数据"
-		},
-		"ctime": {
-			"type": "long",
-			"title": "创建时间",
-			"name": "ctime"
 		}
 	},
 	"job": {
-		"options": {
-			"name": "options",
-			"type": "object",
-			"title": "其他数据"
-		},
-		"env": {
-			"name": "env",
-			"type": "object",
-			"title": "环境数据"
-		},
-		"title": {
-			"name": "title",
-			"type": "string",
-			"length": 255,
-			"title": "说明"
+		"uid": {
+			"index": "asc",
+			"name": "uid",
+			"type": "long",
+			"title": "用户ID"
 		},
 		"platform": {
 			"title": "平台",
@@ -67,9 +57,30 @@
 			"name": "platform"
 		},
 		"version": {
+			"title": "最新版本号",
 			"name": "version",
-			"type": "int",
-			"title": "最新版本号"
+			"type": "int"
+		},
+		"options": {
+			"name": "options",
+			"type": "object",
+			"title": "其他数据"
+		},
+		"mtime": {
+			"name": "mtime",
+			"type": "long",
+			"title": "修改时间"
+		},
+		"title": {
+			"title": "说明",
+			"name": "title",
+			"type": "string",
+			"length": 255
+		},
+		"env": {
+			"type": "object",
+			"title": "环境数据",
+			"name": "env"
 		},
 		"script": {
 			"name": "script",
@@ -81,30 +92,24 @@
 			"name": "ctime",
 			"type": "long",
 			"title": "创建时间"
-		},
-		"mtime": {
-			"title": "修改时间",
-			"name": "mtime",
-			"type": "long"
-		},
-		"uid": {
-			"index": "asc",
-			"name": "uid",
-			"type": "long",
-			"title": "用户ID"
 		}
 	},
 	"job_item": {
 		"status": {
-			"name": "status",
-			"type": "int",
 			"title": "状态",
-			"index": "asc"
+			"index": "asc",
+			"name": "status",
+			"type": "int"
 		},
 		"ctime": {
-			"title": "创建时间",
 			"name": "ctime",
-			"type": "long"
+			"type": "long",
+			"title": "创建时间"
+		},
+		"mtime": {
+			"name": "mtime",
+			"type": "long",
+			"title": "修改时间"
 		},
 		"title": {
 			"name": "title",
@@ -129,46 +134,73 @@
 			"type": "int",
 			"title": "版本号"
 		},
-		"slaveId": {
-			"name": "slaveId",
-			"type": "long",
-			"title": "工作机ID",
-			"index": "asc"
-		},
 		"options": {
+			"name": "options",
 			"type": "object",
-			"title": "其他数据",
-			"name": "options"
-		},
-		"mtime": {
-			"name": "mtime",
-			"type": "long",
-			"title": "修改时间"
+			"title": "其他数据"
 		}
 	},
 	"job_log": {
+		"iid": {
+			"name": "iid",
+			"type": "long",
+			"title": "工作项ID",
+			"index": "asc"
+		},
 		"message": {
+			"length": -1,
 			"title": "日志",
 			"name": "message",
-			"type": "string",
-			"length": -1
+			"type": "string"
 		},
 		"ctime": {
+			"name": "ctime",
 			"type": "long",
-			"title": "创建时间",
-			"name": "ctime"
+			"title": "创建时间"
 		},
 		"jobId": {
 			"name": "jobId",
 			"type": "long",
 			"title": "工作ID",
 			"index": "asc"
-		},
+		}
+	},
+	"job_queue": {
 		"iid": {
-			"title": "工作项ID",
-			"index": "asc",
 			"name": "iid",
-			"type": "long"
+			"type": "long",
+			"title": "工作项ID",
+			"index": "asc"
+		},
+		"platform": {
+			"length": 64,
+			"index": "asc",
+			"name": "platform",
+			"title": "平台",
+			"type": "string"
+		},
+		"ctime": {
+			"name": "ctime",
+			"type": "long",
+			"title": "创建时间"
+		},
+		"uid": {
+			"index": "asc",
+			"name": "uid",
+			"type": "long",
+			"title": "用户ID"
+		},
+		"slaveId": {
+			"name": "slaveId",
+			"type": "long",
+			"title": "工作机ID",
+			"index": "asc"
+		},
+		"jobId": {
+			"index": "asc",
+			"name": "jobId",
+			"type": "long",
+			"title": "工作ID"
 		}
 	}
 }

@@ -29,7 +29,340 @@ func (S *SlaveService) GetTitle() string {
 
 /*E(Title)*/
 
+func getJob(conn db.Database, prefix string, id int64) (*Job, error) {
+
+	job := Job{}
+
+	rs, err := db.Query(conn, &job, prefix, " WHERE id=?", id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rs.Close()
+
+	if rs.Next() {
+
+		scaner := db.NewScaner(&job)
+
+		err = scaner.Scan(rs)
+
+		if err != nil {
+			return nil, err
+		}
+
+		return &job, nil
+
+	} else {
+		return nil, micro.NewError(ERROR_NOT_FOUND, "未找到工作")
+	}
+}
+
+func getJobItem(a micro.IApp, conn db.Database, prefix string, item *JobQueue) (*Job, *JobItem, error) {
+
+	jobItem := JobItem{}
+
+	rs, err := db.Query(conn, &jobItem, Prefix(a, prefix, item.JobId), " WHERE id=? AND status=?", item.Iid, JOB_ITEM_STATUS_NONE)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if rs.Next() {
+
+		scaner := db.NewScaner(&jobItem)
+
+		err = scaner.Scan(rs)
+
+		rs.Close()
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		jobItem.Status = JOB_ITEM_STATUS_RUNNING
+		jobItem.Mtime = time.Now().Unix()
+
+		_, err = db.UpdateWithKeys(conn, &jobItem, Prefix(a, prefix, item.JobId), map[string]bool{"status": true, "mtime": true})
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		job, err := getJob(conn, prefix, item.JobId)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return job, &jobItem, nil
+
+	} else {
+		rs.Close()
+		return nil, nil, micro.NewError(ERROR_NOT_FOUND, "未找到工作项")
+	}
+}
+
 /*B(Handle)*/ /*E(Handle)*/
+/*B(Handle.SlaveJobSet)*/
+/*修改工作状态*/
+func (S *SlaveService) HandleSlaveJobSetTask(a micro.IApp, task *SlaveJobSetTask) error {
+	/*E(Handle.SlaveJobSet)*/
+	//TODO
+
+	if task.Token == "" {
+		return micro.NewError(ERROR_NOT_FOUND_TOKEN, "未找到工作机TOKEN")
+	}
+
+	conn, prefix, err := micro.DBOpen(a, "db")
+
+	if err != nil {
+		return err
+	}
+
+	v := Slave{}
+
+	rs, err := db.Query(conn, &v, prefix, " WHERE token=?", task.Token)
+
+	if err != nil {
+		return err
+	}
+
+	if rs.Next() {
+
+		scaner := db.NewScaner(&v)
+
+		err := scaner.Scan(rs)
+
+		rs.Close()
+
+		if err != nil {
+			return err
+		}
+
+		err = db.Transaction(conn, func(conn db.Database) error {
+
+			item := JobQueue{}
+
+			rs, err := db.Query(conn, &item, prefix, " WHERE uid=? AND slaveId=? AND iid=? AND jobId=? ORDER BY id ASC LIMIT 1", v.Uid, v.Id, task.Iid, task.JobId)
+
+			if err != nil {
+				return err
+			}
+
+			if rs.Next() {
+
+				scaner := db.NewScaner(&item)
+
+				err = scaner.Scan(rs)
+
+				rs.Close()
+
+				if err != nil {
+					return err
+				}
+
+				jobItem := JobItem{}
+
+				_, err = conn.Exec(fmt.Sprintf("UPDATE `%s` SET status=? WHERE id=? AND jobId=?", db.TableName(Prefix(a, prefix, item.JobId), &jobItem)), task.Status, task.Iid, task.JobId)
+
+				if err != nil {
+					return err
+				}
+
+				_, err = db.Delete(conn, &item, prefix)
+
+				if err != nil {
+					return err
+				}
+
+			} else {
+				rs.Close()
+				return micro.NewError(ERROR_NOT_FOUND, "无可用工作")
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			return err
+		}
+
+	} else {
+		rs.Close()
+		return micro.NewError(ERROR_NOT_FOUND, "未找到工作机")
+	}
+
+	return nil
+}
+
+/*B(Handle.SlaveJobLog)*/
+/*日志*/
+func (S *SlaveService) HandleSlaveJobLogTask(a micro.IApp, task *SlaveJobLogTask) error {
+	/*E(Handle.SlaveJobLog)*/
+	//TODO
+
+	if task.Token == "" {
+		return micro.NewError(ERROR_NOT_FOUND_TOKEN, "未找到工作机TOKEN")
+	}
+
+	conn, prefix, err := micro.DBOpen(a, "db")
+
+	if err != nil {
+		return err
+	}
+
+	v := Slave{}
+
+	rs, err := db.Query(conn, &v, prefix, " WHERE token=?", task.Token)
+
+	if err != nil {
+		return err
+	}
+
+	if rs.Next() {
+
+		scaner := db.NewScaner(&v)
+
+		err := scaner.Scan(rs)
+
+		rs.Close()
+
+		if err != nil {
+			return err
+		}
+
+		item := JobQueue{}
+
+		count, err := db.Count(conn, &item, prefix, " WHERE uid=? AND slaveId=? AND iid=? AND jobId=? ORDER BY id ASC LIMIT 1", v.Uid, v.Id, task.Iid, task.JobId)
+
+		if err != nil {
+			return err
+		}
+
+		if count > 0 {
+
+			i := JobLogCreateTask{}
+			i.Iid = task.Iid
+			i.JobId = task.JobId
+			i.Message = task.Message
+
+			err = a.Handle(&i)
+
+			if err != nil {
+				return err
+			}
+
+		} else {
+
+			return micro.NewError(ERROR_NOT_FOUND, "无可用工作")
+		}
+
+	} else {
+		rs.Close()
+		return micro.NewError(ERROR_NOT_FOUND, "未找到工作机")
+	}
+
+	return nil
+}
+
+/*B(Handle.SlaveJobGet)*/
+/*获取工作*/
+func (S *SlaveService) HandleSlaveJobGetTask(a micro.IApp, task *SlaveJobGetTask) error {
+	/*E(Handle.SlaveJobGet)*/
+	//TODO
+
+	if task.Token == "" {
+		return micro.NewError(ERROR_NOT_FOUND_TOKEN, "未找到工作机TOKEN")
+	}
+
+	conn, prefix, err := micro.DBOpen(a, "db")
+
+	if err != nil {
+		return err
+	}
+
+	v := Slave{}
+
+	rs, err := db.Query(conn, &v, prefix, " WHERE token=?", task.Token)
+
+	if err != nil {
+		return err
+	}
+
+	if rs.Next() {
+
+		scaner := db.NewScaner(&v)
+
+		err := scaner.Scan(rs)
+
+		rs.Close()
+
+		if err != nil {
+			return err
+		}
+
+		err = db.Transaction(conn, func(conn db.Database) error {
+
+			item := JobQueue{}
+
+			rs, err = db.Query(conn, &item, prefix, " WHERE uid=? AND platform=? AND slaveId=0 ORDER BY id ASC LIMIT 1", v.Uid, v.Platform)
+
+			if err != nil {
+				return err
+			}
+
+			if rs.Next() {
+
+				scaner := db.NewScaner(&item)
+
+				err := scaner.Scan(rs)
+
+				rs.Close()
+
+				if err != nil {
+					return err
+				}
+
+				item.SlaveId = v.Id
+
+				_, err = db.UpdateWithKeys(conn, &item, prefix, map[string]bool{"slaveId": true})
+
+				if err != nil {
+					return err
+				}
+
+				job, jobItem, err := getJobItem(a, conn, prefix, &item)
+
+				if err != nil {
+					return err
+				}
+
+				task.Result.Item = jobItem
+				task.Result.Job = job
+
+			} else {
+				rs.Close()
+				return micro.NewError(ERROR_NOT_FOUND, "无可用工作")
+			}
+
+			return nil
+		})
+
+		if err != nil {
+			return err
+		}
+
+	} else {
+		rs.Close()
+		return micro.NewError(ERROR_NOT_FOUND, "未找到工作机")
+	}
+
+	task.Result.Slave = &v
+
+	return nil
+}
+
 /*B(Handle.SlaveLogin)*/
 /*登录*/
 func (S *SlaveService) HandleSlaveLoginTask(a micro.IApp, task *SlaveLoginTask) error {
@@ -66,9 +399,51 @@ func (S *SlaveService) HandleSlaveLoginTask(a micro.IApp, task *SlaveLoginTask) 
 			return err
 		}
 
-		item := JobItem{}
+		err = cancelJobQueue(a, conn, prefix, v.Id)
 
-		_, err = conn.Exec(fmt.Sprintf("UPDATE `%s` SET status=? WHERE slaveId=? AND status=?", db.TableName(prefix, &item)), JOB_ITEM_STATUS_ERROR, v.Id, JOB_ITEM_STATUS_RUNNING)
+		if err != nil {
+			return err
+		}
+
+		keys := map[string]bool{}
+
+		keys["status"] = true
+
+		v.Status = SLAVE_STATUS_ONLINE
+
+		if task.Title != "" {
+			keys["title"] = true
+			v.Title = task.Title
+		}
+
+		if task.Platform != "" {
+			keys["platform"] = true
+			v.Platform = task.Platform
+		}
+
+		if task.Options != nil {
+
+			options := map[string]interface{}{}
+
+			dynamic.Each(v.Options, func(key interface{}, value interface{}) bool {
+				options[dynamic.StringValue(key, "")] = value
+				return true
+			})
+
+			dynamic.Each(task.Options, func(key interface{}, value interface{}) bool {
+				options[dynamic.StringValue(key, "")] = value
+				return true
+			})
+
+			keys["options"] = true
+			v.Options = options
+		}
+
+		_, err = db.UpdateWithKeys(conn, &v, prefix, keys)
+
+		if err != nil {
+			return err
+		}
 
 	} else {
 		rs.Close()
@@ -78,6 +453,53 @@ func (S *SlaveService) HandleSlaveLoginTask(a micro.IApp, task *SlaveLoginTask) 
 	task.Result.Slave = &v
 
 	return nil
+}
+
+func cancelJobQueue(a micro.IApp, conn *sql.DB, prefix string, slaveId int64) error {
+
+	return db.Transaction(conn, func(conn db.Database) error {
+
+		item := JobQueue{}
+
+		rs, err := db.Query(conn, &item, prefix, " WHERE slaveId=?", slaveId)
+
+		if err != nil {
+			return err
+		}
+
+		items := []JobQueue{}
+
+		scaner := db.NewScaner(&item)
+
+		for rs.Next() {
+
+			err = scaner.Scan(rs)
+
+			if err != nil {
+				rs.Close()
+				return err
+			}
+
+			items = append(items, item)
+		}
+
+		rs.Close()
+
+		i := JobItem{}
+
+		for _, item = range items {
+			_, err = conn.Exec(fmt.Sprintf("UPDATE `%s` SET status=? WHERE id=? AND status=?", db.TableName(Prefix(a, prefix, item.JobId), &i)), JOB_ITEM_STATUS_ERROR, item.Iid, JOB_ITEM_STATUS_RUNNING)
+			if err != nil {
+				return err
+			}
+			_, err = db.Delete(conn, &item, prefix)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 }
 
 /*B(Handle.SlaveRemove)*/
@@ -117,6 +539,12 @@ func (S *SlaveService) HandleSlaveRemoveTask(a micro.IApp, task *SlaveRemoveTask
 		}
 
 		_, err = db.Delete(conn, &v, prefix)
+
+		if err != nil {
+			return err
+		}
+
+		err = cancelJobQueue(a, conn, prefix, v.Id)
 
 		if err != nil {
 			return err

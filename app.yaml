@@ -88,11 +88,72 @@ services:
           - name: token
             title: TOKEN
             type: string
+          - name: title
+            type: string
+            title: 说明
+          - name: platform
+            title: 平台
+            type: string
+          - name: options
+            type: object
+            title: 其他数据
         output:
           - name: slave
             type: Slave
             omitempty: true
             title: 工作机
+      SlaveJobGet:
+        title: 获取工作
+        name: slave/job/get
+        input:
+          - name: token
+            title: TOKEN
+            type: string
+        output:
+          - name: slave
+            type: Slave
+            omitempty: true
+            title: 工作机
+          - name: job
+            type: Job
+            omitempty: true
+            title: 工作
+          - name: item
+            type: JobItem
+            omitempty: true
+            title: 工作项
+      SlaveJobLog:
+        title: 日志
+        name: slave/job/log
+        input:
+          - name: token
+            title: TOKEN
+            type: string
+          - name: jobId
+            title: 工作ID
+            type: long
+          - name: iid
+            title: 工作项ID
+            type: long
+          - name: message
+            title: 日志
+            type: string
+      SlaveJobSet:
+        title: 修改工作状态
+        name: slave/job/set
+        input:
+          - name: token
+            title: TOKEN
+            type: string
+          - name: jobId
+            title: 工作ID
+            type: long
+          - name: iid
+            title: 工作项ID
+            type: long
+          - name: status
+            title: 状态
+            type: int 
       SlaveQuery:
         title: 查询
         name: slave/query
@@ -414,10 +475,6 @@ objects:
         type: long
         title: 工作ID
         index: asc
-      - name: slaveId
-        type: long
-        title: 工作机ID
-        index: asc
       - name: version
         type: int
         title: 版本号
@@ -451,6 +508,35 @@ objects:
         type: string
         length: -1
         title: 日志
+      - name: ctime
+        type: long
+        title: 创建时间
+  JobQueue:
+    title: 工作队列
+    name: job_queue
+    type: db
+    fields:
+      - name: uid
+        type: long
+        title: 用户ID
+        index: asc
+      - name: slaveId
+        type: long
+        title: 工作机ID
+        index: asc
+      - name: jobId
+        type: long
+        title: 工作ID
+        index: asc
+      - name: iid
+        type: long
+        title: 工作项ID
+        index: asc
+      - name: platform
+        title: 平台
+        type: string
+        length: 64
+        index: asc
       - name: ctime
         type: long
         title: 创建时间
