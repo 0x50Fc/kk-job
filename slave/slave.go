@@ -14,6 +14,7 @@ import (
 
 	"github.com/hailongz/kk-job/app"
 	"github.com/hailongz/kk-lib/dynamic"
+	"github.com/hailongz/kk-lib/http"
 	"github.com/hailongz/kk-micro/micro"
 )
 
@@ -31,7 +32,7 @@ type Slave struct {
 func NewSlave(workdir string, baseURL string, token string, maxCount int) ISlave {
 	v := Slave{}
 	v.workdir = workdir
-	v.remote = micro.NewHttpRemote(baseURL)
+	v.remote = micro.NewHttpRemote(baseURL, http.OptionTypeUrlencode)
 	v.token = token
 	v.maxCount = maxCount
 	return &v
