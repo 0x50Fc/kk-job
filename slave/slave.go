@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -136,7 +137,7 @@ func (S *Slave) Run() {
 
 				task := SlaveLoginTask{}
 				task.Token = S.token
-				task.Platform = "bash"
+				task.Platform = runtime.GOOS
 
 				err := S.remote.Handle(&task)
 

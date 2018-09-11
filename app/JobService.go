@@ -11,8 +11,9 @@ import (
 )
 
 /*B(Import)*/
-	import "github.com/hailongz/kk-micro/micro"
-	/*E(Import)*/
+import "github.com/hailongz/kk-micro/micro"
+
+/*E(Import)*/
 
 type /*B(Service)*/ JobService /*E(Service)*/ struct {
 
@@ -31,7 +32,7 @@ func (S *JobService) GetTitle() string {
 /*B(Handle.JobCreate)*/
 /*创建*/
 func (S *JobService) HandleJobCreateTask(a micro.IApp, task *JobCreateTask) error {
-/*E(Handle.JobCreate)*/
+	/*E(Handle.JobCreate)*/
 	//TODO
 
 	conn, prefix, err := micro.DBOpen(a, "db")
@@ -66,7 +67,7 @@ func (S *JobService) HandleJobCreateTask(a micro.IApp, task *JobCreateTask) erro
 /*B(Handle.JobQuery)*/
 /*查询*/
 func (S *JobService) HandleJobQueryTask(a micro.IApp, task *JobQueryTask) error {
-/*E(Handle.JobQuery)*/
+	/*E(Handle.JobQuery)*/
 	//TODO
 
 	conn, prefix, err := micro.DBOpen(a, "dbr")
@@ -164,7 +165,7 @@ func (S *JobService) HandleJobQueryTask(a micro.IApp, task *JobQueryTask) error 
 /*B(Handle.JobRemove)*/
 /*删除*/
 func (S *JobService) HandleJobRemoveTask(a micro.IApp, task *JobRemoveTask) error {
-/*E(Handle.JobRemove)*/
+	/*E(Handle.JobRemove)*/
 	//TODO
 
 	if task.Id == 0 {
@@ -226,7 +227,7 @@ func (S *JobService) HandleJobRemoveTask(a micro.IApp, task *JobRemoveTask) erro
 /*B(Handle.JobGet)*/
 /*获取*/
 func (S *JobService) HandleJobGetTask(a micro.IApp, task *JobGetTask) error {
-/*E(Handle.JobGet)*/
+	/*E(Handle.JobGet)*/
 	//TODO
 
 	if task.Id == 0 {
@@ -272,14 +273,14 @@ func (S *JobService) HandleJobGetTask(a micro.IApp, task *JobGetTask) error {
 /*B(Handle.JobSet)*/
 /*修改*/
 func (S *JobService) HandleJobSetTask(a micro.IApp, task *JobSetTask) error {
-/*E(Handle.JobSet)*/
+	/*E(Handle.JobSet)*/
 	//TODO
 
 	if task.Id == 0 {
 		return micro.NewError(ERROR_NOT_FOUND_ID, "未找到工作ID")
 	}
 
-	conn, prefix, err := micro.DBOpen(a, "dbr")
+	conn, prefix, err := micro.DBOpen(a, "db")
 
 	if err != nil {
 		return err

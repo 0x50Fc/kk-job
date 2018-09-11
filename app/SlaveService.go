@@ -306,7 +306,29 @@ func (S *SlaveService) HandleSlaveJobGetTask(a micro.IApp, task *SlaveJobGetTask
 
 			item := JobQueue{}
 
-			rs, err = db.Query(conn, &item, prefix, " WHERE uid=? AND platform=? AND slaveId=0 ORDER BY id ASC LIMIT 1", v.Uid, v.Platform)
+			sql := bytes.NewBuffer(nil)
+
+			args := []interface{}{}
+
+			sql.WriteString(" WHERE uid=?")
+
+			args = append(args, v.Uid)
+
+			if v.Platform != "" {
+				sql.WriteString(" AND platform IN (")
+				for i, vv := range strings.Split(v.Platform, ",") {
+					if i != 0 {
+						sql.WriteString("?")
+					}
+					sql.WriteString("?")
+					args = append(args, vv)
+				}
+				sql.WriteString(")")
+			}
+
+			sql.WriteString(" AND slaveId=0 ORDER BY id ASC LIMIT 1")
+
+			rs, err = db.Query(conn, &item, prefix, sql.String(), args...)
 
 			if err != nil {
 				return err
@@ -615,7 +637,7 @@ func (S *SlaveService) HandleSlaveSetTask(a micro.IApp, task *SlaveSetTask) erro
 		return micro.NewError(ERROR_NOT_FOUND_ID, "未找到工作机ID")
 	}
 
-	conn, prefix, err := micro.DBOpen(a, "dbr")
+	conn, prefix, err := micro.DBOpen(a, "db")
 
 	if err != nil {
 		return err
