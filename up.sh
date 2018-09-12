@@ -13,3 +13,4 @@ echo "[DOCKER PUSH] [$PROJECT:$TAG] >>"
 docker push $PROJECT:$TAG
 echo "[OK]"
 rm -rf main
+

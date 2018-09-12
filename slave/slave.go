@@ -123,9 +123,12 @@ func (L *slaveWriter) Write(p []byte) (n int, err error) {
 
 func (S *Slave) Run() {
 
-	ch := make(chan SlaveJobGetTaskResult, S.maxCount)
+	maxCH := make(chan int, S.maxCount)
+
+	ch := make(chan SlaveJobGetTaskResult)
 
 	defer close(ch)
+	defer close(maxCH)
 
 	go func() {
 
@@ -151,6 +154,8 @@ func (S *Slave) Run() {
 
 				log.Println("[LOGIN] [OK]")
 			}
+
+			maxCH <- 1
 
 			task := SlaveJobGetTask{}
 			task.Token = S.token
@@ -299,6 +304,8 @@ func (S *Slave) Run() {
 			} else {
 				log.Printf("[JOB] [%d] [ERROR] %s-%s %s\n", r.JobItem.Id, r.Job.Title, r.JobItem.Title, err.Error())
 			}
+
+			<-maxCH
 
 		}(r)
 	}

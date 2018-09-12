@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
 	"github.com/hailongz/kk-lib/db"
 	"github.com/hailongz/kk-lib/dynamic"
+	"github.com/hailongz/kk-micro/micro"
 )
 
 /*B(Import)*/
-import "github.com/hailongz/kk-micro/micro"
 
 /*E(Import)*/
 
@@ -319,6 +320,8 @@ func (S *SlaveService) HandleSlaveJobGetTask(a micro.IApp, task *SlaveJobGetTask
 			args = append(args, "%"+v.Platform+"%")
 
 			sql.WriteString(" AND slaveId=0 ORDER BY id ASC LIMIT 1")
+
+			log.Println("[SQL]", sql.String())
 
 			rs, err = db.Query(conn, &item, prefix, sql.String(), args...)
 
