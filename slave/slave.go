@@ -252,7 +252,7 @@ func (S *Slave) Run() {
 					code.WriteString("=")
 					b, _ := json.Marshal(value)
 					code.Write(b)
-					code.WriteString("\r\n")
+					code.WriteString("\n")
 				}
 
 				code.WriteString(r.Job.Script)
