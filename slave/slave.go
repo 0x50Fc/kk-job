@@ -155,8 +155,6 @@ func (S *Slave) Run() {
 				log.Println("[LOGIN] [OK]")
 			}
 
-			log.Println("[WAIT] ...")
-
 			maxCH <- 1
 
 			task := SlaveJobGetTask{}
