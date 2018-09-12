@@ -177,6 +177,7 @@ func (S *Slave) Run() {
 
 				log.Println("[JOB] [ERROR]", err)
 				time.Sleep(6 + time.Second)
+				<-maxCH
 				continue
 			}
 
