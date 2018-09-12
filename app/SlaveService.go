@@ -314,17 +314,9 @@ func (S *SlaveService) HandleSlaveJobGetTask(a micro.IApp, task *SlaveJobGetTask
 
 			args = append(args, v.Uid)
 
-			if v.Platform != "" {
-				sql.WriteString(" AND platform IN (")
-				for i, vv := range strings.Split(v.Platform, ",") {
-					if i != 0 {
-						sql.WriteString("?")
-					}
-					sql.WriteString("?")
-					args = append(args, vv)
-				}
-				sql.WriteString(")")
-			}
+			sql.WriteString(" AND platform LIKE ?")
+
+			args = append(args, "%"+v.Platform+"%")
 
 			sql.WriteString(" AND slaveId=0 ORDER BY id ASC LIMIT 1")
 

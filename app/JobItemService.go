@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -209,6 +210,8 @@ func (S *JobItemService) HandleJobItemQueryTask(a micro.IApp, task *JobItemQuery
 
 	var scanner = db.NewScaner(&v)
 	var vs = []JobItem{}
+
+	log.Printf("SELECT * FROM %s%s %s\n", prefix, v.GetName(), sql.String())
 
 	rows, err := db.Query(conn, &v, prefix,
 		sql.String(), args...)
