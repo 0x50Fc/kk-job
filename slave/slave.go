@@ -255,7 +255,13 @@ func (S *Slave) Run() {
 
 				code.WriteString(r.Job.Script)
 
-				cmd := exec.Command("/bin/bash", "-c", code.String())
+				bash, _ := exec.LookPath("bash")
+
+				if bash == "" {
+					bash = "/bin/bash"
+				}
+
+				cmd := exec.Command(bash, "-c", code.String())
 
 				cmd.Dir = path
 
