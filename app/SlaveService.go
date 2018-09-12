@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -321,7 +320,7 @@ func (S *SlaveService) HandleSlaveJobGetTask(a micro.IApp, task *SlaveJobGetTask
 
 			sql.WriteString(" AND slaveId=0 ORDER BY id ASC LIMIT 1")
 
-			log.Println("[SQL]", sql.String())
+			// log.Println("[SQL]", sql.String())
 
 			rs, err = db.Query(conn, &item, prefix, sql.String(), args...)
 

@@ -8,10 +8,10 @@ import (
 
 	"github.com/hailongz/kk-lib/db"
 	"github.com/hailongz/kk-lib/dynamic"
+	"github.com/hailongz/kk-micro/micro"
 )
 
 /*B(Import)*/
-import "github.com/hailongz/kk-micro/micro"
 
 /*E(Import)*/
 
