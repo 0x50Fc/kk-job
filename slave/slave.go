@@ -171,6 +171,7 @@ func (S *Slave) Run() {
 				if ok {
 					if e.Code == 50002 {
 						time.Sleep(6 + time.Second)
+						<-maxCH
 						continue
 					}
 				}
