@@ -261,7 +261,7 @@ func (S *Slave) Run() {
 					bash = "/bin/bash"
 				}
 
-				cmd := exec.Command(bash, "-c", code.String())
+				cmd := exec.Command(bash, "-c", strings.Replace(code.String(), "\r", "", -1))
 
 				cmd.Dir = path
 
