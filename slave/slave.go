@@ -46,9 +46,10 @@ type slaveWriter struct {
 	fd           *os.File
 	line         *bytes.Buffer
 	securityKeys map[string]string
+	ch           chan micro.ITask
 }
 
-func newSlaveWriter(slave *Slave, jobId int64, iid int64, path string, securityKeys map[string]string) (*slaveWriter, error) {
+func newSlaveWriter(slave *Slave, jobId int64, iid int64, path string, securityKeys map[string]string, ch chan micro.ITask) (*slaveWriter, error) {
 	v := slaveWriter{}
 	v.slave = slave
 	v.iid = iid
@@ -106,11 +107,7 @@ func (L *slaveWriter) Write(p []byte) (n int, err error) {
 			task.Iid = L.iid
 			task.JobId = L.jobId
 
-			err := L.slave.remote.Handle(&task)
-
-			if err != nil {
-				log.Println("[JOB] [LOG] [ERROR]", err)
-			}
+			L.ch <- &task
 
 			L.line.Reset()
 		} else {
@@ -124,11 +121,31 @@ func (L *slaveWriter) Write(p []byte) (n int, err error) {
 func (S *Slave) Run() {
 
 	maxCH := make(chan int, S.maxCount)
-
 	ch := make(chan SlaveJobGetTaskResult)
+	sy := make(chan micro.ITask, 256)
 
 	defer close(ch)
 	defer close(maxCH)
+	defer close(sy)
+
+	go func() {
+
+		for {
+
+			task, ok := <-sy
+
+			if !ok {
+				break
+			}
+
+			err := S.remote.Handle(task)
+
+			if err != nil {
+				log.Println("[ERROR]", err)
+			}
+		}
+
+	}()
 
 	go func() {
 
@@ -265,7 +282,7 @@ func (S *Slave) Run() {
 
 				cmd.Dir = path
 
-				stdout, err := newSlaveWriter(S, r.Job.Id, r.JobItem.Id, filepath.Join(path, "info.log"), securityKeys)
+				stdout, err := newSlaveWriter(S, r.Job.Id, r.JobItem.Id, filepath.Join(path, "info.log"), securityKeys, sy)
 
 				if err != nil {
 					return err
